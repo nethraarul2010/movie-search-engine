@@ -1,0 +1,33 @@
+name: Deploy Vite App to Netlify
+
+on:
+  push:
+    branches:
+      - main  # Deploys to Netlify when pushing to main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Vite App
+        run: npm run build
+
+      - name: Deploy to Netlify
+        run: |
+          npm install -g netlify-cli
+          netlify deploy --prod \
+          --dir=dist \
+          --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} \
+          --site=${{ secrets.NETLIFY_SITE_ID }}
