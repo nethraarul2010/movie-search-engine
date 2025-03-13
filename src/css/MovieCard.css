@@ -65,6 +65,7 @@
   transition: background-color 0.2s;
 }
 
+
 .favorite-btn:hover {
   background-color: rgba(0, 0, 0, 0.8);
 }

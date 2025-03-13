@@ -1,31 +1,60 @@
 import MovieCard from "../components/MovieCard";
 import "./../css/Home.css";
-import { useState } from "react";
+import { useState,useEffect } from "react";
+import { searchMovies, getPopularMovies } from "../services/api";
+
 function Home() {
-    const handleSearch = (e) => {
+    const [searchQuery, setSearchQuery] = useState("");
+    const [movies, setMovies] = useState([]);
+    const [loading, setLoading] = useState(false);
+ 
+    useEffect(() => {
+        const loadPopularMovies = async () => {
+            setLoading(true);
+            try {
+                const data = await getPopularMovies()
+                console.log(data);
+                setMovies(data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadPopularMovies();
+     },[]);
+
+     const handleSearch = async (e) => {
         e.preventDefault();
-        alert("Searching for: "+searchQuery)
-    }
-    const [searchQuery,setSearchQuery] = useState("");
-    const movies = [
-        { id: 1, title: "John Wick", release_date: "2014" },
-        { id: 2, title: "Devara", release_date: "2015" },
-        { id: 3, title: "Leo", release_date: "2016" },
-        { id: 4, title: "Madagascar", release_date: "2017" },
-    ];
+        if (!searchQuery.trim()) return
+        if (loading) return;
+        
+        setLoading(true)
+        try{
+            const searchResults = await searchMovies(searchQuery);
+            setMovies(searchResults);
+        }catch(err){
+            console.error(err);
+        }
+        finally{
+            setLoading(false);
+        }
+        };
+
     return (
         <div className="home">
             <form onSubmit={handleSearch} className="search-form">
                 <input type="text" placeholder="Search for Movies ...." className="search-input" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                 <button type="submit" className="search-button">Search</button>
             </form>
+            {loading ? <div className="loading">Loading...</div> : (
             <div className="movies-grid">
                 {movies.map(
                 (movie) => 
                 <MovieCard movie={movie} key={movie.id} />
-                
                 )}
             </div>
+            )}
 
         </div> 
     );
